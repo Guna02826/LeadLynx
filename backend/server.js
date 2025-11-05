@@ -20,7 +20,12 @@ app.get("/api/health", (req, res) => {
   res.json({ ok: true, time: new Date() });
 });
 
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+app.use(
+  cors({
+    origin: "*", 
+    credentials: true,
+  })
+);
 
 app.use("/api/users", userRoute);
 app.use("/api/leads", leadRoute);
