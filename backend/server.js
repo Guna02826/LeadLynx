@@ -29,5 +29,5 @@ app.use("/api/campaigns", campaignRoute);
 app.use(errorHandler);
 
 app.listen(process.env.PORT || 5000, () => {
-  console.log("The app is running at http://localhost:5000");
+  console.log("The app is running");
 });
