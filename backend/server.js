@@ -20,7 +20,7 @@ app.get("/api/health", (req, res) => {
   res.json({ ok: true, time: new Date() });
 });
 
-appp.use(cors());
+app.use(cors());
 
 app.use("/api/users", userRoute);
 app.use("/api/leads", leadRoute);
