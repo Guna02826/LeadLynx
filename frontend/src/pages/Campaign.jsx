@@ -7,6 +7,7 @@ import styles from "./Campaign.module.css";
 function Campaign() {
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [sendingId, setSendingId] = useState(null);
 
   const fetchCampaigns = async () => {
     try {
@@ -27,11 +28,14 @@ function Campaign() {
   const handleSend = async (id) => {
     if (window.confirm("Send this campaign to all leads?")) {
       try {
+        setSendingId(id);
         const response = await api.post(`/campaigns/${id}/send`);
         toast.success(response.data.message);
         fetchCampaigns();
       } catch (error) {
         toast.error(error.response.data.message);
+      } finally {
+        setSendingId(null);
       }
     }
   };
@@ -48,7 +52,7 @@ function Campaign() {
         <ul className={styles.list}>
           {loading ? (
             <p className={styles.loadingText}>Loading campaigns...</p>
-          ) : campaigns.length > 0 ? (
+          ) : campaigns.length ? (
             campaigns.map((campaign) => (
               <li key={campaign._id} className={styles.listItem}>
                 <div className={styles.info}>
@@ -65,7 +69,7 @@ function Campaign() {
                     onClick={() => handleSend(campaign._id)}
                     className={`${styles.button} ${styles.sendBtn}`}
                   >
-                    {loading ? "Sending..." : "Send"}
+                    {sendingId === campaign._id ? "Sending..." : "Send"}
                   </button>
                 )}
               </li>

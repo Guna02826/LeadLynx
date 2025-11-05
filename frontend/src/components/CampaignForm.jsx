@@ -49,7 +49,7 @@ function CampaignForm({ fetchCampaigns }) {
           className={styles.input}
         />
 
-        <input
+        <textarea
           type="text"
           placeholder="Email Text – personalize with {name}, {company}"
           name="text"
