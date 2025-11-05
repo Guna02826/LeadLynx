@@ -48,6 +48,10 @@ export const sendCampaign = async (req, res) => {
         .json({ message: "Not authorized to send this campaign" });
     }
 
+    if (!campaign.leads || campaign.leads.length === 0) {
+      return res.status(400).json({ message: "No leads to send the campaign" });
+    }
+
     for (const lead of campaign.leads) {
       const personalizedSubject = campaign.subject
         .replace("{name}", lead.name || "")
