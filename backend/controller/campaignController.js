@@ -53,15 +53,19 @@ export const sendCampaign = async (req, res) => {
     }
 
     for (const lead of campaign.leads) {
-      const personalizedSubject = campaign.subject
-        .replace("{name}", lead.name || "")
-        .replace("{company}", lead.company || "");
+      try {
+        const personalizedSubject = campaign.subject
+          .replace("{name}", lead.name || "")
+          .replace("{company}", lead.company || "");
+        const personalizedText = campaign.text
+          .replace("{name}", lead.name || "")
+          .replace("{company}", lead.company || "");
 
-      const personalizedText = campaign.text
-        .replace("{name}", lead.name || "")
-        .replace("{company}", lead.company || "");
-
-      await sendEmail(lead.email, personalizedSubject, personalizedText);
+        await sendEmail(lead.email, personalizedSubject, personalizedText);
+      } catch (err) {
+        console.error(`Failed to send email to ${lead.email}:`, err.message);
+        failedEmails.push(lead.email);
+      }
     }
 
     campaign.status = "sent";
@@ -69,8 +73,9 @@ export const sendCampaign = async (req, res) => {
 
     res.json({ message: "Emails sent successfully" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Cannot create campaign", error: error.message });
+    res.status(500).json({
+      message: "Cannot send campaign",
+      error: error.message,
+    });
   }
 };
