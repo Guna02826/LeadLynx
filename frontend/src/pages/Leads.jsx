@@ -6,6 +6,7 @@ import styles from "./Leads.module.css";
 
 function Leads() {
   const [leads, setLeads] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [editingLead, setEditingLead] = useState(null);
 
   const fetchLeads = async () => {
@@ -21,11 +22,14 @@ function Leads() {
   const handleDelete = async (id) => {
     if (window.confirm("Delete this lead?")) {
       try {
+        setLoading(true);
         await api.delete(`/leads/${id}`);
         toast.success("Lead Deleted");
         fetchLeads();
       } catch (error) {
         toast.error(error.response.data.message || "Failed to delete lead");
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -58,13 +62,13 @@ function Leads() {
                   className={`${styles.button} ${styles.editBtn}`}
                   onClick={() => setEditingLead(lead)}
                 >
-                  Edit
+                  {loading ? "Editing" : "Edit"}
                 </button>
                 <button
                   className={`${styles.button} ${styles.deleteBtn}`}
                   onClick={() => handleDelete(lead._id)}
                 >
-                  Delete
+                  {loading ? "Deleting" : "Delete"}
                 </button>
               </div>
             </li>

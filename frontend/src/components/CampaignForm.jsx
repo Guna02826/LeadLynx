@@ -5,6 +5,7 @@ import styles from "./CampaignForm.module.css";
 
 function CampaignForm({ fetchCampaigns }) {
   const [form, setform] = useState({ title: "", subject: "", text: "" });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setform({ ...form, [e.target.name]: e.target.value });
@@ -14,12 +15,15 @@ function CampaignForm({ fetchCampaigns }) {
     e.preventDefault();
 
     try {
+      setLoading(true);
       const response = await api.post("/campaigns", form);
       toast.success(response.data.message);
       fetchCampaigns();
       setform({ title: "", subject: "", text: "" });
     } catch (error) {
       toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -55,8 +59,8 @@ function CampaignForm({ fetchCampaigns }) {
           className={styles.input}
         />
 
-        <button type="submit" className={styles.button}>
-          Create Campaign
+        <button type="submit" disabled={loading} className={styles.button}>
+          {loading ? "Creating Campaign" : "Create Campaign"}
         </button>
       </form>
     </>

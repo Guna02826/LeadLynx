@@ -6,13 +6,17 @@ import styles from "./Campaign.module.css";
 
 function Campaign() {
   const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchCampaigns = async () => {
     try {
+      setLoading(true);
       const response = await api.get("/campaigns");
       setCampaigns(response.data.campaign);
     } catch (error) {
       toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,7 +63,7 @@ function Campaign() {
                     onClick={() => handleSend(campaign._id)}
                     className={`${styles.button} ${styles.sendBtn}`}
                   >
-                    Send
+                    {loading ? "Sending..." : "Send"}
                   </button>
                 )}
               </li>

@@ -10,6 +10,8 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
     company: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (editingLead) setForm(editingLead);
   }, [editingLead]);
@@ -21,6 +23,7 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       if (editingLead) {
         const response = await api.put(`/leads/${editingLead._id}`, form);
         toast.success(response.data.message);
@@ -33,6 +36,8 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
       fetchLeads();
     } catch (error) {
       toast.error(error.response.data.message || "Failed to create Lead");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,7 +71,13 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
         />
 
         <button type="submit" className={styles.button}>
-          {editingLead ? "Update" : "Add"} Lead
+          {loading
+            ? editingLead
+              ? "Updating Lead..."
+              : "Creating Lead..."
+            : editingLead
+            ? "Update Lead"
+            : "Create Lead"}
         </button>
       </form>
     </>
