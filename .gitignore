@@ -1,0 +1,43 @@
+# Node dependencies
+node_modules/
+
+# Env files
+*.env
+backend/.env
+frontend/.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS / system files
+.DS_Store
+Thumbs.db
+
+# Build / output directories
+dist/
+build/
+.out/
+.next/
+
+# IDE / editor configs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Temporary files
+tmp/
+temp/
+
+# Optional npm cache
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Frontend specific
+frontend/dist/
+frontend/build/
+frontend/.cache/
