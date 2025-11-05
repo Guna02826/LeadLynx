@@ -46,7 +46,9 @@ function Campaign() {
         <h3 className={styles.subtitle}>Your Campaigns:</h3>
 
         <ul className={styles.list}>
-          {campaigns.length > 0 ? (
+          {loading ? (
+            <p className={styles.loadingText}>Loading campaigns...</p>
+          ) : campaigns.length > 0 ? (
             campaigns.map((campaign) => (
               <li key={campaign._id} className={styles.listItem}>
                 <div className={styles.info}>
