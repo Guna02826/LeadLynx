@@ -11,11 +11,14 @@ function Leads() {
 
   const fetchLeads = async () => {
     try {
+      setLoading(true);
       const response = await api.get("/leads");
       toast.success(response.data.message);
       setLeads(response.data);
     } catch (error) {
       toast.error(error.response.data.message || "Failed to fetch leads");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,31 +55,29 @@ function Leads() {
 
       <ul className={styles.list}>
         {loading ? (
-          leads.length ? (
-            <p className={styles.loadingText}>Loading Leads...</p>
-          ) : (
-            leads.map((lead) => (
-              <li key={lead._id} className={styles.listItem}>
-                <div className={styles.leadInfo}>
-                  <strong>{lead.name}</strong> – {lead.email} – {lead.company}
-                </div>
-                <div className={styles.actions}>
-                  <button
-                    className={`${styles.button} ${styles.editBtn}`}
-                    onClick={() => setEditingLead(lead)}
-                  >
-                    {loading ? "Editing" : "Edit"}
-                  </button>
-                  <button
-                    className={`${styles.button} ${styles.deleteBtn}`}
-                    onClick={() => handleDelete(lead._id)}
-                  >
-                    {loading ? "Deleting" : "Delete"}
-                  </button>
-                </div>
-              </li>
-            ))
-          )
+          <p className={styles.loadingText}>Loading Leads...</p>
+        ) : leads.length ? (
+          leads.map((lead) => (
+            <li key={lead._id} className={styles.listItem}>
+              <div className={styles.leadInfo}>
+                <strong>{lead.name}</strong> – {lead.email} – {lead.company}
+              </div>
+              <div className={styles.actions}>
+                <button
+                  className={`${styles.button} ${styles.editBtn}`}
+                  onClick={() => setEditingLead(lead)}
+                >
+                  Edit
+                </button>
+                <button
+                  className={`${styles.button} ${styles.deleteBtn}`}
+                  onClick={() => handleDelete(lead._id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </li>
+          ))
         ) : (
           <p className={styles.emptyText}>No Leads Added</p>
         )}
