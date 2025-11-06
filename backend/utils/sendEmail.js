@@ -1,19 +1,22 @@
-import nodemailer from "nodemailer";
+import sgMail from "@sendgrid/mail";
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export const sendEmail = async (to, subject, text) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  const mailOptions = {
-    from: `"Lead Lynx" <${process.env.EMAIL_USER}>`,
+  const msg = {
     to,
+    from: process.env.EMAIL_USER,
     subject,
     text,
   };
-  await transporter.sendMail(mailOptions);
+
+  try {
+    await sgMail.send(msg);
+    console.log("✅ Email sent successfully");
+  } catch (error) {
+    console.error(
+      "❌ Error sending email:",
+      error.response?.body || error.message
+    );
+  }
 };
