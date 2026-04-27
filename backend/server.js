@@ -17,7 +17,7 @@ app.use(helmet());
 app.use(express.json());
 
 app.get("/api/health", (req, res) => {
-  res.json({ ok: true, time: new Date() });
+  res.status(200).json({ ok: true });
 });
 
 app.use(cors());
