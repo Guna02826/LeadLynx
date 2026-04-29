@@ -1,12 +1,24 @@
-import { useState } from "react";
-import { MailPlus, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { MailPlus, Sparkles, Save, X } from "lucide-react";
 import { toast } from "react-toastify";
 import api from "../api";
 import styles from "./CampaignForm.module.css";
 
-function CampaignForm({ fetchCampaigns }) {
+function CampaignForm({ fetchCampaigns, editingCampaign, setEditingCampaign }) {
   const [form, setForm] = useState({ title: "", subject: "", text: "" });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (editingCampaign) {
+      setForm({
+        title: editingCampaign.title || "",
+        subject: editingCampaign.subject || "",
+        text: editingCampaign.text || "",
+      });
+    } else {
+      setForm({ title: "", subject: "", text: "" });
+    }
+  }, [editingCampaign]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -16,12 +28,18 @@ function CampaignForm({ fetchCampaigns }) {
     e.preventDefault();
     try {
       setLoading(true);
-      const response = await api.post("/campaigns", form);
-      toast.success(response.data.message || "Campaign created!");
+      if (editingCampaign) {
+        const response = await api.put(`/campaigns/${editingCampaign._id}`, form);
+        toast.success(response.data.message || "Campaign updated!");
+        setEditingCampaign(null);
+      } else {
+        const response = await api.post("/campaigns", form);
+        toast.success(response.data.message || "Campaign created!");
+      }
       fetchCampaigns();
       setForm({ title: "", subject: "", text: "" });
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to create campaign");
+      toast.error(error.response?.data?.message || "Operation failed");
     } finally {
       setLoading(false);
     }
@@ -30,8 +48,8 @@ function CampaignForm({ fetchCampaigns }) {
   return (
     <div className={styles.formCard}>
       <h2 className={styles.formTitle}>
-        <MailPlus size={20} />
-        New Outreach Campaign
+        {editingCampaign ? <Save size={20} /> : <MailPlus size={20} />}
+        {editingCampaign ? "Edit Campaign" : "New Outreach Campaign"}
       </h2>
 
       <form onSubmit={handleSubmit} className={styles.form}>
@@ -78,8 +96,18 @@ function CampaignForm({ fetchCampaigns }) {
         </div>
 
         <button type="submit" disabled={loading} className={styles.button}>
-          {loading ? "Creating..." : "Create Campaign"}
+          {loading ? "Saving..." : editingCampaign ? "Update Campaign" : "Create Campaign"}
         </button>
+
+        {editingCampaign && (
+          <button
+            type="button"
+            className={styles.cancelBtn}
+            onClick={() => setEditingCampaign(null)}
+          >
+            <X size={14} /> Cancel Editing
+          </button>
+        )}
       </form>
     </div>
   );

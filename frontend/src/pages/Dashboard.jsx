@@ -24,10 +24,10 @@ function Dashboard() {
       const totalLeads = leadsRes.data.length;
       const totalCampaigns = campaignsRes.data.campaign.length;
       const sentCampaigns = campaignsRes.data.campaign.filter(
-        (c) => c.status === "sent"
+        (c) => c.status?.toLowerCase() === "sent"
       ).length;
       const draftCampaigns = campaignsRes.data.campaign.filter(
-        (c) => c.status === "New"
+        (c) => c.status?.toLowerCase() === "new" || c.status?.toLowerCase() === "draft"
       ).length;
 
       setStats({

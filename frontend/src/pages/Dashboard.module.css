@@ -77,8 +77,26 @@
   letter-spacing: 0.05em;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+  
+  .card {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.75rem;
+  }
+  
   .statsGrid {
     grid-template-columns: 1fr;
+  }
+  
+  .number {
+    font-size: 1.75rem;
   }
 }

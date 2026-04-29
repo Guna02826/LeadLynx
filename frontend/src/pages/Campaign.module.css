@@ -70,26 +70,49 @@
   color: var(--accent);
 }
 
-.sendBtn {
-  background: var(--primary);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
+.campaignActions {
   display: flex;
-  align-items: center;
   gap: 0.5rem;
 }
 
+.iconBtn {
+  padding: 0.625rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.editBtn {
+  color: var(--primary);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.editBtn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.sendBtn {
+  color: var(--success);
+  background: rgba(34, 197, 94, 0.1);
+}
+
 .sendBtn:hover:not(:disabled) {
-  background: var(--primary-hover);
+  background: var(--success);
+  color: white;
   transform: translateY(-1px);
 }
 
-.sendBtn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+.deleteBtn {
+  color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.deleteBtn:hover {
+  background: var(--error);
+  color: white;
 }
 
 .loadingText, .emptyText {
@@ -104,5 +127,25 @@
 @media (max-width: 900px) {
   .mainContent {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 1.75rem;
+    text-align: center;
+  }
+
+  .card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .campaignActions {
+    width: 100%;
+    justify-content: flex-end;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
   }
 }

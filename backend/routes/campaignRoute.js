@@ -4,6 +4,8 @@ import {
   getCampaign,
   createCampaign,
   sendCampaign,
+  updateCampaign,
+  deleteCampaign,
 } from "../controller/campaignController.js";
 import protect from "../middleware/authMiddleware.js";
 import { validateRequest } from "../middleware/validatorMiddleware.js";
@@ -25,5 +27,19 @@ router
   );
 
 router.route("/:id/send").all(protect).post(sendCampaign);
+
+router
+  .route("/:id")
+  .all(protect)
+  .put(
+    [
+      body("title").optional().notEmpty().withMessage("Campaign title is required"),
+      body("subject").optional().notEmpty().withMessage("Email subject is required"),
+      body("text").optional().notEmpty().withMessage("Email body is required"),
+    ],
+    validateRequest,
+    updateCampaign
+  )
+  .delete(deleteCampaign);
 
 export default router;

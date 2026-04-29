@@ -41,3 +41,4 @@ temp/
 frontend/dist/
 frontend/build/
 frontend/.cache/
+backend/scripts/seedData.js

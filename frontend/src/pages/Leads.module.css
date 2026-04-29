@@ -178,3 +178,32 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .searchWrapper {
+    max-width: none;
+  }
+
+  .card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: flex-end;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+  }
+
+  .meta {
+    flex-wrap: wrap;
+  }
+}

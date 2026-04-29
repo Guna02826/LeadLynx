@@ -4,11 +4,18 @@
   left: 0;
   right: 0;
   height: 70px;
+  z-index: 1000;
+  transition: var(--transition);
+}
+
+.headerContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 100%;
   display: flex;
   align-items: center;
-  z-index: 1000;
+  justify-content: space-between;
   padding: 0 2rem;
-  transition: var(--transition);
 }
 
 .brand {
@@ -22,7 +29,6 @@
 }
 
 .navbar {
-  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -79,14 +85,101 @@
   color: white;
 }
 
-@media (max-width: 768px) {
-  .header {
-    padding: 0 1rem;
+.menuToggle {
+  display: none;
+  background: none;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: var(--transition);
+}
+
+.menuToggle:hover {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary);
+}
+
+@media (max-width: 992px) {
+  .headerContainer {
+    padding: 0 1.5rem;
   }
   
-  .username {
-    display: none;
+  .menuToggle {
+    display: block;
+    color: var(--text-primary);
+    z-index: 2001;
   }
+
+  .navbar {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: var(--surface);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 6rem 2rem;
+    gap: 1.5rem;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+    z-index: 2000;
+  }
+
+  .menuActive {
+    right: 0;
+  }
+
+  .userSection {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .userInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+    width: 100%;
+  }
+
+  .username {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .link {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .link span, .demoLink span {
+    display: block;
+  }
+
+  .demoLink {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  .mobileOnly {
+    display: inline;
+  }
+
+  .navGroup {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+  }
+}
+
+.mobileOnly {
+  display: none;
 }
 
 .demoLink {

@@ -87,3 +87,43 @@ export const sendCampaign = async (req, res) => {
     });
   }
 };
+
+export const updateCampaign = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const campaign = await Campaign.findById(id);
+
+    if (!campaign) {
+      return res.status(404).json({ message: "Campaign not found" });
+    }
+
+    if (campaign.owner.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not authorized to update this campaign" });
+    }
+
+    const updatedCampaign = await Campaign.findByIdAndUpdate(id, req.body, { new: true });
+    res.json({ message: "Campaign updated successfully", campaign: updatedCampaign });
+  } catch (error) {
+    res.status(500).json({ message: "Cannot update campaign", error: error.message });
+  }
+};
+
+export const deleteCampaign = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const campaign = await Campaign.findById(id);
+
+    if (!campaign) {
+      return res.status(404).json({ message: "Campaign not found" });
+    }
+
+    if (campaign.owner.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not authorized to delete this campaign" });
+    }
+
+    await Campaign.findByIdAndDelete(id);
+    res.json({ message: "Campaign deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Cannot delete campaign", error: error.message });
+  }
+};

@@ -136,3 +136,14 @@
 .demoButton:hover:not(:disabled) {
   background: rgba(99, 102, 241, 0.05);
 }
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1.5rem;
+    border-radius: 1rem;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+}

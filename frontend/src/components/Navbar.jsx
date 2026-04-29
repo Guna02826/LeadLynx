@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router";
-import { LayoutDashboard, Users, Send, LogOut, Zap, Sparkles } from "lucide-react";
+import { LayoutDashboard, Users, Send, LogOut, Zap, Sparkles, Menu, X } from "lucide-react";
 import { toast } from "react-toastify";
 import api from "../api";
 import styles from "./Navbar.module.css";
 
 function Navbar() {
   const [user, setUser] = useState(localStorage.getItem("user"));
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,53 +50,65 @@ function Navbar() {
 
   return (
     <header className={`${styles.header} glass`}>
-      <Link to="/" className={styles.brand}>
-        <Zap size={24} fill="currentColor" />
-        <span>LeadLynx</span>
-      </Link>
+      <div className={styles.headerContainer}>
+        <Link to="/" className={styles.brand}>
+          <Zap size={24} fill="currentColor" />
+          <span>LeadLynx</span>
+        </Link>
 
-      <nav className={styles.navbar}>
-        {!user ? (
-          <>
-            <button onClick={handleDemoLogin} className={styles.demoLink}>
-              <Sparkles size={16} />
-              <span>Explore Demo</span>
-            </button>
-            <Link to="/login" className={styles.link}>
-              Login
-            </Link>
-            <Link to="/register" className={`${styles.link} ${styles.active}`}>
-              Get Started
-            </Link>
-          </>
-        ) : (
-          <div className={styles.userSection}>
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  `${styles.link} ${isActive ? styles.active : ""}`
-                }
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </NavLink>
-            ))}
-            
-            <div className={styles.userInfo}>
-              <span className={styles.username}>{user}</span>
-              <button
-                onClick={handleLogout}
-                className={`${styles.link} ${styles.logout}`}
-                title="Logout"
-              >
-                <LogOut size={18} />
+        <nav className={`${styles.navbar} ${isMenuOpen ? styles.menuActive : ""}`}>
+          {!user ? (
+            <div className={styles.navGroup}>
+              <button onClick={handleDemoLogin} className={styles.demoLink}>
+                <Sparkles size={16} />
+                <span>Explore Demo</span>
               </button>
+              <Link to="/login" className={styles.link} onClick={() => setIsMenuOpen(false)}>
+                Login
+              </Link>
+              <Link to="/register" className={`${styles.link} ${styles.active}`} onClick={() => setIsMenuOpen(false)}>
+                Get Started
+              </Link>
             </div>
-          </div>
-        )}
-      </nav>
+          ) : (
+            <div className={styles.userSection}>
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `${styles.link} ${isActive ? styles.active : ""}`
+                  }
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </NavLink>
+              ))}
+              
+              <div className={styles.userInfo}>
+                <span className={styles.username}>{user}</span>
+                <button
+                  onClick={handleLogout}
+                  className={`${styles.link} ${styles.logout}`}
+                  title="Logout"
+                >
+                  <LogOut size={18} />
+                  <span className={styles.mobileOnly}>Logout</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </nav>
+
+        <button 
+          className={styles.menuToggle} 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
     </header>
   );
 }
