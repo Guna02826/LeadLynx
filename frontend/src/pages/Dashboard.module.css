@@ -1,67 +1,84 @@
 .container {
-  min-height: 100vh;
-  background: #f4f6f8;
-  padding: 2rem;
-  font-family: "Poppins", sans-serif;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3rem;
+  text-align: center;
 }
 
 .title {
-  text-align: center;
-  font-size: 2rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 2rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
 }
 
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.5rem;
-  max-width: 900px;
-  margin: 0 auto;
 }
 
 .card {
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  background: var(--surface);
+  padding: 2rem;
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  animation: fadeIn 0.4s ease;
+  transition: var(--transition);
 }
 
 .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+
+.iconWrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 1rem;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
 }
 
 .number {
-  font-size: 2rem;
+  font-size: 2.25rem;
   font-weight: 700;
-  color: #007bff;
+  color: var(--text-primary);
+  line-height: 1;
   margin-bottom: 0.5rem;
 }
 
 .label {
-  font-size: 1rem;
-  color: #555;
+  font-size: 0.875rem;
   font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .statsGrid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+    grid-template-columns: 1fr;
   }
 }

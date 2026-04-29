@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { Users, Mail, Send, FileText } from "lucide-react";
+import { toast } from "react-toastify";
 import api from "../api";
-import { ToastContainer, toast } from "react-toastify";
 import styles from "./Dashboard.module.css";
 
 function Dashboard() {
@@ -10,9 +11,11 @@ function Dashboard() {
     sentCampaigns: 0,
     draftCampaigns: 0,
   });
+  const [loading, setLoading] = useState(true);
 
   const fetchStats = async () => {
     try {
+      setLoading(true);
       const [leadsRes, campaignsRes] = await Promise.all([
         api.get("/leads"),
         api.get("/campaigns"),
@@ -34,7 +37,9 @@ function Dashboard() {
         draftCampaigns,
       });
     } catch (error) {
-      toast.error(error.response.data.message || `couldn't fetch data`);
+      toast.error(error.response?.data?.message || "Failed to fetch dashboard data");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -42,35 +47,32 @@ function Dashboard() {
     fetchStats();
   }, []);
 
+  const statCards = [
+    { label: "Total Leads", value: stats.totalLeads, icon: <Users size={24} /> },
+    { label: "Total Campaigns", value: stats.totalCampaigns, icon: <Mail size={24} /> },
+    { label: "Sent Campaigns", value: stats.sentCampaigns, icon: <Send size={24} /> },
+    { label: "Draft Campaigns", value: stats.draftCampaigns, icon: <FileText size={24} /> },
+  ];
+
   return (
-    <>
-      <div className={styles.container}>
-        <h1 className={styles.title}>📊 Dashboard</h1>
+    <div className={styles.container}>
+      <header className={styles.header}>
+        <h1 className={styles.title}>Dashboard Overview</h1>
+        <p className={styles.subtitle}>Welcome back! Here's what's happening with your leads.</p>
+      </header>
 
-        <div className={styles.statsGrid}>
-          <div className={styles.card}>
-            <h2 className={styles.number}>{stats.totalLeads}</h2>
-            <p className={styles.label}>Total Leads</p>
+      <div className={styles.statsGrid}>
+        {statCards.map((stat, index) => (
+          <div key={index} className={styles.card}>
+            <div className={styles.iconWrapper}>{stat.icon}</div>
+            <h2 className={styles.number}>
+              {loading ? "..." : stat.value}
+            </h2>
+            <p className={styles.label}>{stat.label}</p>
           </div>
-
-          <div className={styles.card}>
-            <h2 className={styles.number}>{stats.totalCampaigns}</h2>
-            <p className={styles.label}>Total Campaigns</p>
-          </div>
-
-          <div className={styles.card}>
-            <h2 className={styles.number}>{stats.sentCampaigns}</h2>
-            <p className={styles.label}>Sent Campaigns</p>
-          </div>
-
-          <div className={styles.card}>
-            <h2 className={styles.number}>{stats.draftCampaigns}</h2>
-            <p className={styles.label}>Draft Campaigns</p>
-          </div>
-        </div>
+        ))}
       </div>
-      <ToastContainer />
-    </>
+    </div>
   );
 }
 

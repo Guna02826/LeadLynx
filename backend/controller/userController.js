@@ -48,8 +48,34 @@ export const loginUser = async (req, res) => {
         token: generatedToken,
         user: user.name,
       });
-    ``;
   } catch (error) {
-    res.status(500).json("User cannot be logged in", error.message);
+    res.status(500).json({ message: "User cannot be logged in", error: error.message });
   }
 };
+
+export const demoLogin = async (req, res) => {
+  try {
+    const demoEmail = "demo@leadlynx.com";
+    let user = await User.findOne({ email: demoEmail });
+
+    if (!user) {
+      user = new User({
+        name: "Demo Recruiter",
+        email: demoEmail,
+        password: "demo_password_123",
+      });
+      await user.save();
+    }
+
+    const generatedToken = generateToken(user.id, user.email);
+
+    res.status(200).json({
+      message: "Logged in as Demo User",
+      token: generatedToken,
+      user: user.name,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Demo login failed", error: error.message });
+  }
+};
+

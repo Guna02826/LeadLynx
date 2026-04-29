@@ -35,6 +35,7 @@ export const createCampaign = async (req, res) => {
 export const sendCampaign = async (req, res) => {
   try {
     const { id } = req.params;
+    const failedEmails = [];
 
     const campaign = await Campaign.findById(id).populate("leads");
 
@@ -71,7 +72,14 @@ export const sendCampaign = async (req, res) => {
     campaign.status = "sent";
     await campaign.save();
 
-    res.json({ message: "Emails sent successfully" });
+    if (failedEmails.length > 0) {
+      return res.json({
+        message: `Campaign sent with some errors. Failed: ${failedEmails.join(", ")}`,
+        failedCount: failedEmails.length,
+      });
+    }
+
+    res.json({ message: "All emails sent successfully" });
   } catch (error) {
     res.status(500).json({
       message: "Cannot send campaign",

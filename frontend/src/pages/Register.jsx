@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { UserPlus, Mail, Lock, User } from "lucide-react";
+import { toast } from "react-toastify";
 import api from "../api";
-import { ToastContainer, toast } from "react-toastify";
 import styles from "./Register.module.css";
 
 function Register() {
@@ -19,67 +20,81 @@ function Register() {
     try {
       setLoading(true);
       const response = await api.post("/users/register", form);
-      toast.success(response.data.message);
+      toast.success(response.data.message || "Account created! Please log in.");
       setTimeout(() => navigate("/login"), 500);
     } catch (error) {
-      toast.error(error.response.data.message || "Couldn't register user");
+      toast.error(error.response?.data?.message || "Registration failed. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <>
+    <div className={styles.wrapper}>
       <div className={styles.container}>
-        <h1 className={styles.title}>Register</h1>
+        <header>
+          <h1 className={styles.title}>Create Account</h1>
+          <p className={styles.subtitle}>Join LeadLynx and start growing your leads.</p>
+        </header>
 
         <form onSubmit={handleSubmit} className={styles.form}>
-          <label className={styles.label}>Name:</label>
-          <input
-            type="text"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            className={styles.input}
-          />
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Full Name</label>
+            <input
+              type="text"
+              name="name"
+              placeholder="John Doe"
+              value={form.name}
+              required
+              onChange={handleChange}
+              className={styles.input}
+            />
+          </div>
 
-          <label className={styles.label}>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            className={styles.input}
-          />
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Email Address</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="john@example.com"
+              value={form.email}
+              required
+              onChange={handleChange}
+              className={styles.input}
+            />
+          </div>
 
-          <label className={styles.label}>Password:</label>
-          <input
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            className={styles.input}
-          />
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="••••••••"
+              value={form.password}
+              required
+              onChange={handleChange}
+              className={styles.input}
+            />
+          </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={styles.button}
-          >
-            {loading ? "Registering..." : "Register"}
+          <button type="submit" disabled={loading} className={styles.button}>
+            {loading ? "Creating Account..." : (
+              <>
+                <UserPlus size={18} />
+                <span>Get Started</span>
+              </>
+            )}
           </button>
         </form>
 
-        <p className={styles.linkText}>
+        <footer className={styles.footer}>
           Already have an account?{" "}
           <Link to="/login" className={styles.link}>
-            Login
+            Sign In
           </Link>
-        </p>
-
-        <ToastContainer />
+        </footer>
       </div>
-    </>
+    </div>
   );
 }
 

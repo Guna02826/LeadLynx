@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
+import { LayoutDashboard, Users, Send, LogOut, Zap, Sparkles } from "lucide-react";
+import { toast } from "react-toastify";
+import api from "../api";
 import styles from "./Navbar.module.css";
 
 function Navbar() {
@@ -19,42 +22,77 @@ function Navbar() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
-    window.dispatchEvent(new Event("authChange")); // ✅ triggers re-render
+    window.dispatchEvent(new Event("authChange"));
     navigate("/login");
   };
+
+  const handleDemoLogin = async () => {
+    try {
+      const response = await api.post("/users/demo-login");
+      toast.success(response.data.message || "Logged in as Demo User");
+
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", response.data.user);
+      window.dispatchEvent(new Event("authChange"));
+
+      setTimeout(() => navigate("/"), 500);
+    } catch (error) {
+      toast.error("Demo login failed.");
+    }
+  };
+
+  const navItems = [
+    { to: "/", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
+    { to: "/leads", label: "Leads", icon: <Users size={18} /> },
+    { to: "/campaign", label: "Campaign", icon: <Send size={18} /> },
+  ];
+
   return (
-    <header className={styles.navbarContainer}>
-      <div className={styles.brand}>LeadLynx</div>
+    <header className={`${styles.header} glass`}>
+      <Link to="/" className={styles.brand}>
+        <Zap size={24} fill="currentColor" />
+        <span>LeadLynx</span>
+      </Link>
 
       <nav className={styles.navbar}>
         {!user ? (
           <>
+            <button onClick={handleDemoLogin} className={styles.demoLink}>
+              <Sparkles size={16} />
+              <span>Explore Demo</span>
+            </button>
             <Link to="/login" className={styles.link}>
               Login
             </Link>
-            <Link to="/register" className={styles.link}>
-              Register
+            <Link to="/register" className={`${styles.link} ${styles.active}`}>
+              Get Started
             </Link>
           </>
         ) : (
           <div className={styles.userSection}>
-            <Link to="/" className={styles.link}>
-              Dashboard
-            </Link>
-            <Link to="/leads" className={styles.link}>
-              Leads
-            </Link>
-            <Link to="/campaign" className={styles.link}>
-              Campaign
-            </Link>
-            <span className={styles.username}>Hello, {user}</span>
-            <Link
-              to="/login"
-              onClick={handleLogout}
-              className={`${styles.link} ${styles.logout}`}
-            >
-              Logout
-            </Link>
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `${styles.link} ${isActive ? styles.active : ""}`
+                }
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </NavLink>
+            ))}
+            
+            <div className={styles.userInfo}>
+              <span className={styles.username}>{user}</span>
+              <button
+                onClick={handleLogout}
+                className={`${styles.link} ${styles.logout}`}
+                title="Logout"
+              >
+                <LogOut size={18} />
+              </button>
+            </div>
           </div>
         )}
       </nav>

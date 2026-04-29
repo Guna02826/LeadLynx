@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { Send, Clock, CheckCircle, PlusCircle } from "lucide-react";
+import { toast } from "react-toastify";
 import api from "../api";
 import CampaignForm from "../components/CampaignForm";
-import { ToastContainer, toast } from "react-toastify";
 import styles from "./Campaign.module.css";
 
 function Campaign() {
@@ -15,7 +16,7 @@ function Campaign() {
       const response = await api.get("/campaigns");
       setCampaigns(response.data.campaign);
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to load campaigns");
     } finally {
       setLoading(false);
     }
@@ -26,14 +27,14 @@ function Campaign() {
   }, []);
 
   const handleSend = async (id) => {
-    if (window.confirm("Send this campaign to all leads?")) {
+    if (window.confirm("Ready to launch? This will send emails to all leads in this campaign.")) {
       try {
         setSendingId(id);
         const response = await api.post(`/campaigns/${id}/send`);
-        toast.success(response.data.message);
+        toast.success(response.data.message || "Campaign launched successfully!");
         fetchCampaigns();
       } catch (error) {
-        toast.error(error.response.data.message);
+        toast.error(error.response?.data?.message || "Launch failed");
       } finally {
         setSendingId(null);
       }
@@ -41,46 +42,66 @@ function Campaign() {
   };
 
   return (
-    <>
-      <div className={styles.container}>
-        <h2 className={styles.title}>📣 Campaign</h2>
+    <div className={styles.container}>
+      <h1 className={styles.title}>Email Campaigns</h1>
 
-        <CampaignForm fetchCampaigns={fetchCampaigns} />
+      <div className={styles.mainContent}>
+        <aside>
+          <CampaignForm fetchCampaigns={fetchCampaigns} />
+        </aside>
 
-        <h3 className={styles.subtitle}>Your Campaigns:</h3>
+        <section>
+          <h2 className={styles.subtitle}>Recent Campaigns</h2>
+          <div className={styles.list}>
+            {loading ? (
+              <div className={styles.loadingText}>Fetching campaigns...</div>
+            ) : campaigns.length > 0 ? (
+              campaigns.map((campaign) => (
+                <div key={campaign._id} className={styles.card}>
+                  <div className={styles.campaignInfo}>
+                    <h4>{campaign.title}</h4>
+                    <div className={styles.statusBadge}>
+                      {campaign.status === "sent" ? (
+                        <span className={`${styles.status} ${styles.statusSent}`}>
+                          <CheckCircle size={12} style={{ marginRight: 4 }} />
+                          Sent
+                        </span>
+                      ) : (
+                        <span className={`${styles.status} ${styles.statusNew}`}>
+                          <Clock size={12} style={{ marginRight: 4 }} />
+                          Draft
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-        <ul className={styles.list}>
-          {loading ? (
-            <p className={styles.loadingText}>Loading campaigns...</p>
-          ) : campaigns.length ? (
-            campaigns.map((campaign) => (
-              <li key={campaign._id} className={styles.listItem}>
-                <div className={styles.info}>
-                  <strong>{campaign.title}</strong> —{" "}
-                  {campaign.status === "sent" ? (
-                    <span className={styles.sent}>✅ Sent</span>
-                  ) : (
-                    <span className={styles.new}>🕓 New</span>
+                  {campaign.status !== "sent" && (
+                    <button
+                      onClick={() => handleSend(campaign._id)}
+                      disabled={sendingId === campaign._id}
+                      className={styles.sendBtn}
+                    >
+                      {sendingId === campaign._id ? (
+                        "Sending..."
+                      ) : (
+                        <>
+                          <Send size={16} />
+                          <span>Launch</span>
+                        </>
+                      )}
+                    </button>
                   )}
                 </div>
-
-                {campaign.status !== "sent" && (
-                  <button
-                    onClick={() => handleSend(campaign._id)}
-                    className={`${styles.button} ${styles.sendBtn}`}
-                  >
-                    {sendingId === campaign._id ? "Sending..." : "Send"}
-                  </button>
-                )}
-              </li>
-            ))
-          ) : (
-            <p className={styles.emptyText}>No campaigns yet</p>
-          )}
-        </ul>
+              ))
+            ) : (
+              <div className={styles.emptyText}>
+                No campaigns created yet. Start your first outreach!
+              </div>
+            )}
+          </div>
+        </section>
       </div>
-      <ToastContainer />
-    </>
+    </div>
   );
 }
 
