@@ -78,8 +78,19 @@ function Leads() {
             filteredLeads.map((lead) => (
               <div key={lead._id} className={styles.card}>
                 <div className={styles.leadDetails}>
-                  <h3>{lead.name}</h3>
-                  <p>{lead.email} • {lead.company}</p>
+                  <div className={styles.leadHeader}>
+                    <h3>{lead.name}</h3>
+                    <span className={`${styles.badge} ${styles[lead.status?.toLowerCase()]}`}>
+                      {lead.status}
+                    </span>
+                  </div>
+                  <p className={styles.meta}>
+                    <span>{lead.email}</span>
+                    <span className={styles.dot}>•</span>
+                    <span>{lead.company}</span>
+                    <span className={styles.dot}>•</span>
+                    <span className={styles.source}>Source: {lead.source}</span>
+                  </p>
                 </div>
                 <div className={styles.actions}>
                   <button

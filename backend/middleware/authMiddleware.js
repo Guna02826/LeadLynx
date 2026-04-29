@@ -7,8 +7,13 @@ export const protect = async (req, res, next) => {
     if (!token) return res.status(401).json({ message: "No token provided" });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id).select("-password");
+    const user = await User.findById(decoded.id).select("-password");
 
+    if (!user) {
+      return res.status(401).json({ message: "User no longer exists" });
+    }
+
+    req.user = user;
     next();
   } catch (error) {
     res.status(401).json({ message: "Invalid token", error: error.message });

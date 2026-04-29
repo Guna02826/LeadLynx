@@ -7,7 +7,7 @@ export const getCampaign = async (req, res) => {
     const campaign = await Campaign.find({ owner: req.user._id });
     res.status(200).json({ campaign: campaign });
   } catch (error) {
-    res.status(500).json({ message: "Cannot fetch campaigns" });
+    res.status(500).json({ message: "Cannot fetch campaigns", error: error.message });
   }
 };
 
