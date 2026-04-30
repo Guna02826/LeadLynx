@@ -20,6 +20,11 @@ router
       body("name").notEmpty().withMessage("Lead name is required"),
       body("email").isEmail().withMessage("Please provide a valid email"),
       body("company").notEmpty().withMessage("Company name is required"),
+      body("source").optional().isString(),
+      body("status")
+        .optional()
+        .isIn(["New", "Contacted", "Qualified", "Disqualified"])
+        .withMessage("Invalid status"),
     ],
     validateRequest,
     createLead
@@ -33,6 +38,11 @@ router
       body("name").optional().notEmpty().withMessage("Name cannot be empty"),
       body("email").optional().isEmail().withMessage("Please provide a valid email"),
       body("company").optional().notEmpty().withMessage("Company cannot be empty"),
+      body("source").optional().isString(),
+      body("status")
+        .optional()
+        .isIn(["New", "Contacted", "Qualified", "Disqualified"])
+        .withMessage("Invalid status"),
     ],
     validateRequest,
     updateLead

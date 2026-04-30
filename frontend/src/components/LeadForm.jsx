@@ -9,13 +9,15 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
     name: "",
     email: "",
     company: "",
+    source: "Manual",
+    status: "New",
   });
 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (editingLead) setForm(editingLead);
-    else setForm({ name: "", email: "", company: "" });
+    else setForm({ name: "", email: "", company: "", source: "Manual", status: "New" });
   }, [editingLead]);
 
   const handleChange = (e) => {
@@ -34,7 +36,7 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
         const response = await api.post("/leads", form);
         toast.success(response.data.message || "New lead added successfully");
       }
-      setForm({ name: "", email: "", company: "" });
+      setForm({ name: "", email: "", company: "", source: "Manual", status: "New" });
       fetchLeads();
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong");
@@ -86,6 +88,34 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
             required
             className={styles.input}
           />
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label className={styles.label}>Source</label>
+          <input
+            name="source"
+            placeholder="Manual, Website, etc."
+            value={form.source}
+            onChange={handleChange}
+            className={styles.input}
+          />
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label className={styles.label}>Status</label>
+          <div className={styles.statusContainer}>
+            {["New", "Contacted", "Qualified", "Disqualified"].map((status) => (
+              <span
+                key={status}
+                className={`${styles.statusBadge} ${styles[status.toLowerCase()]} ${
+                  form.status === status ? styles.activeStatus : ""
+                }`}
+                onClick={() => setForm({ ...form, status })}
+              >
+                {status}
+              </span>
+            ))}
+          </div>
         </div>
 
         <button type="submit" disabled={loading} className={styles.button}>

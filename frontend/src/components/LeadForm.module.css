@@ -90,3 +90,38 @@
 .cancelBtn:hover {
   color: var(--error);
 }
+
+.statusContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.statusBadge {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.4rem 0.75rem;
+  border-radius: 9999px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: var(--transition);
+  opacity: 0.6;
+}
+
+.statusBadge:hover {
+  opacity: 1;
+}
+
+.activeStatus {
+  opacity: 1;
+  border-color: currentColor;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.new { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
+.contacted { background: rgba(245, 158, 11, 0.1); color: var(--accent); }
+.qualified { background: rgba(34, 197, 94, 0.1); color: var(--success); }
+.disqualified { background: rgba(239, 68, 68, 0.1); color: var(--error); }
