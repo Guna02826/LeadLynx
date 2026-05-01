@@ -1,44 +1,27 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router";
 import { LayoutDashboard, Users, Send, LogOut, Zap, Sparkles, Menu, X } from "lucide-react";
 import { toast } from "react-toastify";
-import api from "../api";
+import { useAuth } from "../context/AuthContext";
 import styles from "./Navbar.module.css";
 
 function Navbar() {
-  const [user, setUser] = useState(localStorage.getItem("user"));
+  const { user, logout, demoLogin } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const handleAuthChange = () => {
-      setUser(localStorage.getItem("user"));
-    };
-
-    window.addEventListener("authChange", handleAuthChange);
-    return () => window.removeEventListener("authChange", handleAuthChange);
-  }, []);
-
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
-    window.dispatchEvent(new Event("authChange"));
+    logout();
     navigate("/login");
   };
 
   const handleDemoLogin = async () => {
-    try {
-      const response = await api.post("/users/demo-login");
-      toast.success(response.data.message || "Logged in as Demo User");
-
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", response.data.user);
-      window.dispatchEvent(new Event("authChange"));
-
-      setTimeout(() => navigate("/"), 500);
-    } catch (error) {
-      toast.error("Demo login failed.");
+    const result = await demoLogin();
+    if (result.success) {
+      toast.success("Logged in as Demo User");
+      navigate("/");
+    } else {
+      toast.error(result.message);
     }
   };
 

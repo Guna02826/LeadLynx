@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { UserPlus, Save, X } from "lucide-react";
 import { toast } from "react-toastify";
 import api from "../api";
+import Input from "./common/Input";
+import Button from "./common/Button";
 import styles from "./LeadForm.module.css";
 
 function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
@@ -53,53 +55,41 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
       </h2>
       
       <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.inputGroup}>
-          <label className={styles.label}>Full Name</label>
-          <input
-            name="name"
-            placeholder="John Doe"
-            value={form.name}
-            onChange={handleChange}
-            required
-            className={styles.input}
-          />
-        </div>
+        <Input
+          label="Full Name"
+          name="name"
+          placeholder="John Doe"
+          value={form.name}
+          onChange={handleChange}
+          required
+        />
 
-        <div className={styles.inputGroup}>
-          <label className={styles.label}>Email Address</label>
-          <input
-            name="email"
-            type="email"
-            placeholder="john@example.com"
-            value={form.email}
-            onChange={handleChange}
-            required
-            className={styles.input}
-          />
-        </div>
+        <Input
+          label="Email Address"
+          type="email"
+          name="email"
+          placeholder="john@example.com"
+          value={form.email}
+          onChange={handleChange}
+          required
+        />
 
-        <div className={styles.inputGroup}>
-          <label className={styles.label}>Company</label>
-          <input
-            name="company"
-            placeholder="Acme Inc."
-            value={form.company}
-            onChange={handleChange}
-            required
-            className={styles.input}
-          />
-        </div>
+        <Input
+          label="Company"
+          name="company"
+          placeholder="Acme Inc."
+          value={form.company}
+          onChange={handleChange}
+          required
+        />
 
-        <div className={styles.inputGroup}>
-          <label className={styles.label}>Source</label>
-          <input
-            name="source"
-            placeholder="Manual, Website, etc."
-            value={form.source}
-            onChange={handleChange}
-            className={styles.input}
-          />
-        </div>
+        <Input
+          label="Source"
+          name="source"
+          placeholder="Manual, Website, etc."
+          value={form.source}
+          onChange={handleChange}
+        />
 
         <div className={styles.inputGroup}>
           <label className={styles.label}>Status</label>
@@ -118,18 +108,19 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
           </div>
         </div>
 
-        <button type="submit" disabled={loading} className={styles.button}>
+        <Button type="submit" disabled={loading}>
           {loading ? "Saving..." : editingLead ? "Update Lead" : "Create Lead"}
-        </button>
+        </Button>
 
         {editingLead && (
-          <button
-            type="button"
-            className={styles.cancelBtn}
+          <Button
+            variant="danger"
             onClick={() => setEditingLead(null)}
+            className={styles.cancelBtn}
+            icon={<X size={14} />}
           >
-            <X size={14} /> Cancel Editing
-          </button>
+            Cancel Editing
+          </Button>
         )}
       </form>
     </div>

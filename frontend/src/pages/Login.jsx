@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { LogIn, Mail, Lock } from "lucide-react";
 import { toast } from "react-toastify";
-import api from "../api";
+import { useAuth } from "../context/AuthContext";
 import styles from "./Login.module.css";
 
 function Login() {
+  const { login, demoLogin } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
@@ -19,16 +20,16 @@ function Login() {
     e.preventDefault();
     try {
       setLoading(true);
-      const response = await api.post("/users/login", form);
-      toast.success(response.data.message || "Logged in successfully!");
-
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", response.data.user);
-      window.dispatchEvent(new Event("authChange"));
-
-      setTimeout(() => navigate("/"), 500);
+      const result = await login(form.email, form.password);
+      
+      if (result.success) {
+        toast.success("Logged in successfully!");
+        navigate("/");
+      } else {
+        toast.error(result.message);
+      }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed. Check your credentials.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -37,14 +38,14 @@ function Login() {
   const handleDemoLogin = async () => {
     try {
       setLoading(true);
-      const response = await api.post("/users/demo-login");
-      toast.success(response.data.message || "Logged in as Demo User");
-
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", response.data.user);
-      window.dispatchEvent(new Event("authChange"));
-
-      setTimeout(() => navigate("/"), 500);
+      const result = await demoLogin();
+      
+      if (result.success) {
+        toast.success("Logged in as Demo User");
+        navigate("/");
+      } else {
+        toast.error(result.message);
+      }
     } catch (error) {
       toast.error("Demo login failed. Please try again.");
     } finally {

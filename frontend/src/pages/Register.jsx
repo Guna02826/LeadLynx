@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { UserPlus, Mail, Lock, User } from "lucide-react";
 import { toast } from "react-toastify";
-import api from "../api";
+import { useAuth } from "../context/AuthContext";
 import styles from "./Register.module.css";
 
 function Register() {
+  const { register } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
@@ -19,11 +20,16 @@ function Register() {
     e.preventDefault();
     try {
       setLoading(true);
-      const response = await api.post("/users/register", form);
-      toast.success(response.data.message || "Account created! Please log in.");
-      setTimeout(() => navigate("/login"), 500);
+      const result = await register(form.name, form.email, form.password);
+      
+      if (result.success) {
+        toast.success("Account created successfully!");
+        navigate("/");
+      } else {
+        toast.error(result.message);
+      }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Registration failed. Try again.");
+      toast.error("Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }

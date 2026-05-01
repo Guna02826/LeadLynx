@@ -3,6 +3,8 @@ import { Search, Edit2, Trash2, UserPlus } from "lucide-react";
 import { toast } from "react-toastify";
 import api from "../api";
 import LeadForm from "../components/LeadForm";
+import SearchBar from "../components/SearchBar";
+import LeadCard from "../components/LeadCard";
 import styles from "./Leads.module.css";
 
 function Leads() {
@@ -50,16 +52,11 @@ function Leads() {
     <div className={styles.container}>
       <header className={styles.header}>
         <h1 className={styles.title}>Leads Management</h1>
-        <div className={styles.searchWrapper}>
-          <Search size={18} className={styles.searchIcon} />
-          <input
-            type="text"
-            placeholder="Search leads..."
-            className={styles.searchInput}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+        <SearchBar
+          placeholder="Search leads..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </header>
 
       <div className={styles.mainContent}>
@@ -76,39 +73,12 @@ function Leads() {
             <div className={styles.loadingText}>Loading your leads...</div>
           ) : filteredLeads.length > 0 ? (
             filteredLeads.map((lead) => (
-              <div key={lead._id} className={styles.card}>
-                <div className={styles.leadDetails}>
-                  <div className={styles.leadHeader}>
-                    <h3>{lead.name}</h3>
-                    <span className={`${styles.badge} ${styles[lead.status?.toLowerCase()]}`}>
-                      {lead.status}
-                    </span>
-                  </div>
-                  <p className={styles.meta}>
-                    <span>{lead.email}</span>
-                    <span className={styles.dot}>•</span>
-                    <span>{lead.company}</span>
-                    <span className={styles.dot}>•</span>
-                    <span className={styles.source}>Source: {lead.source}</span>
-                  </p>
-                </div>
-                <div className={styles.actions}>
-                  <button
-                    className={`${styles.iconBtn} ${styles.editBtn}`}
-                    onClick={() => setEditingLead(lead)}
-                    title="Edit Lead"
-                  >
-                    <Edit2 size={16} />
-                  </button>
-                  <button
-                    className={`${styles.iconBtn} ${styles.deleteBtn}`}
-                    onClick={() => handleDelete(lead._id)}
-                    title="Delete Lead"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
+              <LeadCard
+                key={lead._id}
+                lead={lead}
+                onEdit={setEditingLead}
+                onDelete={handleDelete}
+              />
             ))
           ) : (
             <div className={styles.emptyText}>

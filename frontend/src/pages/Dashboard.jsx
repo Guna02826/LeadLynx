@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Users, Mail, Send, FileText } from "lucide-react";
 import { toast } from "react-toastify";
 import api from "../api";
+import StatCard from "../components/StatCard";
 import styles from "./Dashboard.module.css";
 
 function Dashboard() {
@@ -63,13 +64,13 @@ function Dashboard() {
 
       <div className={styles.statsGrid}>
         {statCards.map((stat, index) => (
-          <div key={index} className={styles.card}>
-            <div className={styles.iconWrapper}>{stat.icon}</div>
-            <h2 className={styles.number}>
-              {loading ? "..." : stat.value}
-            </h2>
-            <p className={styles.label}>{stat.label}</p>
-          </div>
+          <StatCard
+            key={index}
+            label={stat.label}
+            value={stat.value}
+            icon={stat.icon}
+            loading={loading}
+          />
         ))}
       </div>
     </div>
