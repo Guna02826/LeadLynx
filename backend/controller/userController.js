@@ -1,81 +1,67 @@
 import { User } from "../models/userModel.js";
 import generateToken from "../utils/generateToken.js";
+import { asyncHandler } from "../middleware/asyncHandler.js";
+import { successResponse, errorResponse } from "../utils/apiResponse.js";
 
-export const registerUser = async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
+/**
+ * @desc    Register a new user
+ * @route   POST /api/users/register
+ * @access  Public
+ */
+export const registerUser = asyncHandler(async (req, res) => {
+  const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    const existing = await User.findOne({ email });
-    if (existing)
-      return res.status(400).json({ message: "User already exists" });
-
-    const user = new User({ name, email, password });
-    await user.save();
-
-    res.json({ message: "User registered successfully" });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "User cannot be created", error: error.message });
+  if (!name || !email || !password) {
+    return errorResponse(res, "All fields are required", 400);
   }
-};
 
-export const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!req.body.email || !req.body.password) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    const user = await User.findOne({ email });
-    if (!user)
-      return res.status(400).json({ message: "Invalid email or password" });
-
-    if (!user.isMatch(password))
-      return res.status(400).json({ message: "Invalid email or password" });
-
-    const generatedToken = generateToken(user.id, user.email);
-
-    res
-      .status(200)
-      .json({
-        message: "Logged in Successfully",
-        token: generatedToken,
-        user: user.name,
-      });
-  } catch (error) {
-    res.status(500).json({ message: "User cannot be logged in", error: error.message });
+  const existing = await User.findOne({ email });
+  if (existing) {
+    return errorResponse(res, "User already exists", 400);
   }
-};
 
-export const demoLogin = async (req, res) => {
-  try {
-    const demoEmail = "demo@leadlynx.com";
-    let user = await User.findOne({ email: demoEmail });
+  const user = new User({ name, email, password });
+  await user.save();
 
-    if (!user) {
-      user = new User({
-        name: "Demo Recruiter",
-        email: demoEmail,
-        password: "demo_password_123",
-      });
-      await user.save();
-    }
+  const token = generateToken(user.id, user.email);
+  return successResponse(res, { token, user: user.name }, "User registered successfully", 201);
+});
 
-    const generatedToken = generateToken(user.id, user.email);
+/**
+ * @desc    Authenticate user & get token
+ * @route   POST /api/users/login
+ * @access  Public
+ */
+export const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-    res.status(200).json({
-      message: "Logged in as Demo User",
-      token: generatedToken,
-      user: user.name,
+  const user = await User.findOne({ email });
+  if (!user || !(await user.isMatch(password))) {
+    return errorResponse(res, "Invalid email or password", 401);
+  }
+
+  const token = generateToken(user.id, user.email);
+  return successResponse(res, { token, user: user.name }, "Logged in successfully");
+});
+
+/**
+ * @desc    Login as a demo recruiter
+ * @route   POST /api/users/demo-login
+ * @access  Public
+ */
+export const demoLogin = asyncHandler(async (req, res) => {
+  const demoEmail = "demo@leadlynx.com";
+  let user = await User.findOne({ email: demoEmail });
+
+  if (!user) {
+    user = new User({
+      name: "Demo Recruiter",
+      email: demoEmail,
+      password: "demo_password_123",
     });
-  } catch (error) {
-    res.status(500).json({ message: "Demo login failed", error: error.message });
+    await user.save();
   }
-};
 
+  const token = generateToken(user.id, user.email);
+  return successResponse(res, { token, user: user.name }, "Logged in as Demo User");
+});

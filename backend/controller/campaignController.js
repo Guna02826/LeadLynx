@@ -1,129 +1,130 @@
 import { Campaign } from "../models/campaignModel.js";
 import { Lead } from "../models/leadModel.js";
 import { sendEmail } from "../utils/sendEmail.js";
+import { asyncHandler } from "../middleware/asyncHandler.js";
+import { successResponse, errorResponse } from "../utils/apiResponse.js";
 
-export const getCampaign = async (req, res) => {
-  try {
-    const campaign = await Campaign.find({ owner: req.user._id });
-    res.status(200).json({ campaign: campaign });
-  } catch (error) {
-    res.status(500).json({ message: "Cannot fetch campaigns", error: error.message });
+/**
+ * @desc    Get all campaigns for the authenticated user
+ * @route   GET /api/campaigns
+ * @access  Private
+ */
+export const getCampaign = asyncHandler(async (req, res) => {
+  const campaigns = await Campaign.find({ owner: req.user._id });
+  // We keep the 'campaign' key to minimize frontend changes for now, 
+  // but wrap it in our success utility.
+  return successResponse(res, { campaign: campaigns }, "Campaigns fetched successfully");
+});
+
+/**
+ * @desc    Create a new campaign
+ * @route   POST /api/campaigns
+ * @access  Private
+ */
+export const createCampaign = asyncHandler(async (req, res) => {
+  const leads = await Lead.find({ owner: req.user.id });
+  const leadsIds = leads.map((lead) => lead._id);
+
+  const campaign = await Campaign.create({
+    ...req.body,
+    owner: req.user.id,
+    leads: leadsIds,
+  });
+
+  return successResponse(res, { campaign }, "Campaign created successfully", 201);
+});
+
+/**
+ * @desc    Send emails for a specific campaign
+ * @route   POST /api/campaigns/send/:id
+ * @access  Private
+ */
+export const sendCampaign = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const failedEmails = [];
+
+  const campaign = await Campaign.findById(id).populate("leads");
+
+  if (!campaign) {
+    return errorResponse(res, "Campaign not found", 404);
   }
-};
 
-export const createCampaign = async (req, res) => {
-  try {
-    const leads = await Lead.find({ owner: req.user.id });
-    const leadsIds = leads.map((lead) => lead._id);
-
-    const campaign = await Campaign.create({
-      ...req.body,
-      owner: req.user.id,
-      leads: leadsIds,
-    });
-
-    res
-      .status(201)
-      .json({ message: "Created new campaign", campaign: campaign });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Cannot create campaign", error: error.message });
+  if (campaign.owner.toString() !== req.user._id.toString()) {
+    return errorResponse(res, "Not authorized to send this campaign", 403);
   }
-};
 
-export const sendCampaign = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const failedEmails = [];
-
-    const campaign = await Campaign.findById(id).populate("leads");
-
-    if (!campaign) {
-      return res.status(404).json({ message: "Campaign not found" });
-    }
-
-    if (campaign.owner.toString() !== req.user._id.toString()) {
-      return res
-        .status(403)
-        .json({ message: "Not authorized to send this campaign" });
-    }
-
-    if (!campaign.leads || campaign.leads.length === 0) {
-      return res.status(400).json({ message: "No leads to send the campaign" });
-    }
-
-    for (const lead of campaign.leads) {
-      try {
-        const personalizedSubject = campaign.subject
-          .replace("{name}", lead.name || "")
-          .replace("{company}", lead.company || "");
-        const personalizedText = campaign.text
-          .replace("{name}", lead.name || "")
-          .replace("{company}", lead.company || "");
-
-        await sendEmail(lead.email, personalizedSubject, personalizedText);
-      } catch (err) {
-        console.error(`Failed to send email to ${lead.email}:`, err.message);
-        failedEmails.push(lead.email);
-      }
-    }
-
-    campaign.status = "sent";
-    await campaign.save();
-
-    if (failedEmails.length > 0) {
-      return res.json({
-        message: `Campaign sent with some errors. Failed: ${failedEmails.join(", ")}`,
-        failedCount: failedEmails.length,
-      });
-    }
-
-    res.json({ message: "All emails sent successfully" });
-  } catch (error) {
-    res.status(500).json({
-      message: "Cannot send campaign",
-      error: error.message,
-    });
+  if (!campaign.leads || campaign.leads.length === 0) {
+    return errorResponse(res, "No leads assigned to this campaign", 400);
   }
-};
 
-export const updateCampaign = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const campaign = await Campaign.findById(id);
+  // Personalization logic
+  for (const lead of campaign.leads) {
+    try {
+      const personalizedSubject = campaign.subject
+        .replace(/{name}/g, lead.name || "")
+        .replace(/{company}/g, lead.company || "");
+      const personalizedText = campaign.text
+        .replace(/{name}/g, lead.name || "")
+        .replace(/{company}/g, lead.company || "");
 
-    if (!campaign) {
-      return res.status(404).json({ message: "Campaign not found" });
+      await sendEmail(lead.email, personalizedSubject, personalizedText);
+    } catch (err) {
+      console.error(`Failed to send email to ${lead.email}:`, err.message);
+      failedEmails.push(lead.email);
     }
-
-    if (campaign.owner.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Not authorized to update this campaign" });
-    }
-
-    const updatedCampaign = await Campaign.findByIdAndUpdate(id, req.body, { new: true });
-    res.json({ message: "Campaign updated successfully", campaign: updatedCampaign });
-  } catch (error) {
-    res.status(500).json({ message: "Cannot update campaign", error: error.message });
   }
-};
 
-export const deleteCampaign = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const campaign = await Campaign.findById(id);
+  campaign.status = "sent";
+  await campaign.save();
 
-    if (!campaign) {
-      return res.status(404).json({ message: "Campaign not found" });
-    }
-
-    if (campaign.owner.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Not authorized to delete this campaign" });
-    }
-
-    await Campaign.findByIdAndDelete(id);
-    res.json({ message: "Campaign deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Cannot delete campaign", error: error.message });
+  if (failedEmails.length > 0) {
+    return successResponse(res, {
+      failedEmails,
+      failedCount: failedEmails.length
+    }, `Campaign sent with some errors. Failed: ${failedEmails.join(", ")}`);
   }
-};
+
+  return successResponse(res, null, "All emails sent successfully");
+});
+
+/**
+ * @desc    Update a campaign
+ * @route   PUT /api/campaigns/:id
+ * @access  Private
+ */
+export const updateCampaign = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const campaign = await Campaign.findById(id);
+
+  if (!campaign) {
+    return errorResponse(res, "Campaign not found", 404);
+  }
+
+  if (campaign.owner.toString() !== req.user._id.toString()) {
+    return errorResponse(res, "Not authorized to update this campaign", 403);
+  }
+
+  const updatedCampaign = await Campaign.findByIdAndUpdate(id, req.body, { new: true });
+  return successResponse(res, { campaign: updatedCampaign }, "Campaign updated successfully");
+});
+
+/**
+ * @desc    Delete a campaign
+ * @route   DELETE /api/campaigns/:id
+ * @access  Private
+ */
+export const deleteCampaign = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const campaign = await Campaign.findById(id);
+
+  if (!campaign) {
+    return errorResponse(res, "Campaign not found", 404);
+  }
+
+  if (campaign.owner.toString() !== req.user._id.toString()) {
+    return errorResponse(res, "Not authorized to delete this campaign", 403);
+  }
+
+  await Campaign.findByIdAndDelete(id);
+  return successResponse(res, null, "Campaign deleted successfully");
+});

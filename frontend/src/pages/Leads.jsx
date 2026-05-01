@@ -17,7 +17,7 @@ function Leads() {
     try {
       setLoading(true);
       const response = await api.get("/leads");
-      setLeads(response.data);
+      setLeads(response.data.data);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch leads");
     } finally {

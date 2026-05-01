@@ -18,7 +18,7 @@ function Campaign() {
     try {
       setLoading(true);
       const response = await api.get("/campaigns");
-      setCampaigns(response.data.campaign);
+      setCampaigns(response.data.data.campaign);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to load campaigns");
     } finally {

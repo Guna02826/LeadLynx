@@ -22,12 +22,12 @@ function Dashboard() {
         api.get("/campaigns"),
       ]);
 
-      const totalLeads = leadsRes.data.length;
-      const totalCampaigns = campaignsRes.data.campaign.length;
-      const sentCampaigns = campaignsRes.data.campaign.filter(
+      const totalLeads = leadsRes.data.data.length;
+      const totalCampaigns = campaignsRes.data.data.campaign.length;
+      const sentCampaigns = campaignsRes.data.data.campaign.filter(
         (c) => c.status?.toLowerCase() === "sent"
       ).length;
-      const draftCampaigns = campaignsRes.data.campaign.filter(
+      const draftCampaigns = campaignsRes.data.data.campaign.filter(
         (c) => c.status?.toLowerCase() === "new" || c.status?.toLowerCase() === "draft"
       ).length;
 

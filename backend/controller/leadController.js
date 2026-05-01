@@ -1,71 +1,65 @@
 import { Lead } from "../models/leadModel.js";
+import { asyncHandler } from "../middleware/asyncHandler.js";
+import { successResponse, errorResponse } from "../utils/apiResponse.js";
 
-export const getLeads = async (req, res) => {
-  try {
-    const leads = await Lead.find({ owner: req.user._id });
-    res.status(200).json(leads);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Cannot retrieve Lead", error: error.message });
+/**
+ * @desc    Get all leads for the authenticated user
+ * @route   GET /api/leads
+ * @access  Private
+ */
+export const getLeads = asyncHandler(async (req, res) => {
+  const leads = await Lead.find({ owner: req.user._id });
+  return successResponse(res, leads, "Leads retrieved successfully");
+});
+
+/**
+ * @desc    Create a new lead
+ * @route   POST /api/leads
+ * @access  Private
+ */
+export const createLead = asyncHandler(async (req, res) => {
+  const lead = await Lead.create({ ...req.body, owner: req.user._id });
+  return successResponse(res, lead, "New lead created successfully", 201);
+});
+
+/**
+ * @desc    Update an existing lead
+ * @route   PUT /api/leads/:id
+ * @access  Private
+ */
+export const updateLead = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const lead = await Lead.findById(id);
+
+  if (!lead) {
+    return errorResponse(res, "Lead not found", 404);
   }
-};
 
-export const createLead = async (req, res) => {
-  try {
-    const lead = await Lead.create({ ...req.body, owner: req.user._id });
-    res.status(201).json({ message: "Created new lead", lead: lead });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Cannot create Lead", error: error.message });
+  if (lead.owner.toString() !== req.user._id.toString()) {
+    return errorResponse(res, "Not authorized to modify this lead", 403);
   }
-};
 
-export const updateLead = async (req, res) => {
-  try {
-    const id = req.params.id;
-    const exists = await Lead.findById(id);
-    if (!exists)
-      return res.status(404).json({ message: "No such Lead Exists" });
+  const updatedLead = await Lead.findByIdAndUpdate(id, req.body, { new: true });
+  return successResponse(res, updatedLead, "Lead updated successfully");
+});
 
-    if (exists.owner.toString() !== req.user._id.toString()) {
-      return res
-        .status(403)
-        .json({ message: "Not authorized to modify this lead" });
-    }
+/**
+ * @desc    Delete a lead
+ * @route   DELETE /api/leads/:id
+ * @access  Private
+ */
+export const deleteLead = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const lead = await Lead.findById(id);
 
-    const lead = await Lead.findByIdAndUpdate(id, req.body, { new: true });
-
-    res.json({ message: "Updated Lead", lead: lead });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Cannot update the Lead", error: error.message });
+  if (!lead) {
+    return errorResponse(res, "Lead not found", 404);
   }
-};
 
-export const deleteLead = async (req, res) => {
-  try {
-    const id = req.params.id;
-
-    const exists = await Lead.findById(id);
-
-    if (!exists)
-      return res.status(404).json({ message: "No such Lead Exists" });
-
-    if (exists.owner.toString() !== req.user._id.toString()) {
-      return res
-        .status(403)
-        .json({ message: "Not authorized to modify this lead" });
-    }
-
-    const lead = await Lead.findByIdAndDelete(id);
-
-    res.status(200).json({ message: "Lead Successfully Deleted" });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Cannot Delete the Lead", error: error.message });
+  if (lead.owner.toString() !== req.user._id.toString()) {
+    return errorResponse(res, "Not authorized to delete this lead", 403);
   }
-};
+
+  await Lead.findByIdAndDelete(id);
+  return successResponse(res, null, "Lead deleted successfully");
+});
