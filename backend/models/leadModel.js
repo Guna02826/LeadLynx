@@ -7,6 +7,6 @@ const leadSchema = new mongoose.Schema({
   status: { type: String, default: "New" },
   source: { type: String, default: "Manual" },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-});
+}, { timestamps: true });
 
 export const Lead = mongoose.model("Lead", leadSchema);

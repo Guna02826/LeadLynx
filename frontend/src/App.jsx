@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router";
+import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import { ToastContainer } from "react-toastify";
 import Navbar from "./components/Navbar.jsx";
@@ -73,12 +74,30 @@ function AnimatedRoutes() {
 }
 
 function App() {
+  const [toastPos, setToastPos] = useState("bottom-right");
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setToastPos("top-center");
+      } else if (window.innerWidth < 1024) {
+        setToastPos("top-right");
+      } else {
+        setToastPos("bottom-right");
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <BrowserRouter>
       <Navbar />
       <AnimatedRoutes />
       <ToastContainer
-        position="bottom-right"
+        position={toastPos}
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop

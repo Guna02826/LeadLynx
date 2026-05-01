@@ -8,14 +8,15 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = () => {
-      const storedUser = localStorage.getItem("user");
-      const token = localStorage.getItem("token");
-      
-      if (storedUser && token) {
-        setUser(storedUser);
+    const checkAuth = async () => {
+      try {
+        const response = await api.get("/users/me");
+        setUser(response.data.data.user);
+      } catch (error) {
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     checkAuth();
@@ -24,12 +25,9 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await api.post("/users/login", { email, password });
-      const { token, user: userData } = response.data.data;
+      const { user: userData } = response.data.data;
       
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", userData);
       setUser(userData);
-      
       return { success: true };
     } catch (error) {
       return {
@@ -42,12 +40,9 @@ export const AuthProvider = ({ children }) => {
   const demoLogin = async () => {
     try {
       const response = await api.post("/users/demo-login");
-      const { token, user: userData } = response.data.data;
+      const { user: userData } = response.data.data;
       
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", userData);
       setUser(userData);
-      
       return { success: true };
     } catch (error) {
       return {
@@ -60,12 +55,9 @@ export const AuthProvider = ({ children }) => {
   const register = async (name, email, password) => {
     try {
       const response = await api.post("/users/register", { name, email, password });
-      const { token, user: userData } = response.data.data;
+      const { user: userData } = response.data.data;
       
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", userData);
       setUser(userData);
-      
       return { success: true };
     } catch (error) {
       return {
@@ -75,10 +67,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
+  const logout = async () => {
+    try {
+      await api.post("/users/logout");
+      setUser(null);
+    } catch (error) {
+      console.error("Logout failed on server", error);
+      setUser(null);
+    }
   };
 
   return (

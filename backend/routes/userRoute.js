@@ -1,7 +1,8 @@
 import express from "express";
 import { body } from "express-validator";
-import { registerUser, loginUser, demoLogin } from "../controller/userController.js";
+import { registerUser, loginUser, demoLogin, logoutUser, getMe } from "../controller/userController.js";
 import { validateRequest } from "../middleware/validatorMiddleware.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -29,5 +30,7 @@ router.post(
 );
 
 router.post("/demo-login", demoLogin);
+router.post("/logout", logoutUser);
+router.get("/me", protect, getMe);
 
 export default router;

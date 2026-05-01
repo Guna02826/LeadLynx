@@ -3,6 +3,7 @@ import { Users, Mail, Send, FileText } from "lucide-react";
 import { toast } from "react-toastify";
 import api from "../api";
 import StatCard from "../components/StatCard";
+import LeadAnalytics from "../components/LeadAnalytics";
 import styles from "./Dashboard.module.css";
 
 function Dashboard() {
@@ -12,6 +13,7 @@ function Dashboard() {
     sentCampaigns: 0,
     draftCampaigns: 0,
   });
+  const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchStats = async () => {
@@ -22,7 +24,10 @@ function Dashboard() {
         api.get("/campaigns"),
       ]);
 
-      const totalLeads = leadsRes.data.data.length;
+      const allLeads = leadsRes.data.data;
+      setLeads(allLeads);
+      
+      const totalLeads = allLeads.length;
       const totalCampaigns = campaignsRes.data.data.campaign.length;
       const sentCampaigns = campaignsRes.data.data.campaign.filter(
         (c) => c.status?.toLowerCase() === "sent"
@@ -73,6 +78,8 @@ function Dashboard() {
           />
         ))}
       </div>
+
+      <LeadAnalytics leads={leads} loading={loading} />
     </div>
   );
 }

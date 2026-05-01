@@ -8,7 +8,17 @@ import { errorResponse } from "../utils/apiResponse.js";
  */
 export const protect = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
+    let token;
+
+    // Check for token in cookies first
+    if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
+    } 
+    // Fallback to Authorization header for flexibility
+    else if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+      token = req.headers.authorization.split(" ")[1];
+    }
+
     if (!token) {
       return errorResponse(res, "No token provided, authorization denied", 401);
     }

@@ -78,6 +78,48 @@ button {
   border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--secondary);
+/* Toastify Custom Styles & Safe Zones */
+.Toastify__toast-container {
+  z-index: 9999 !important;
+}
+
+/* Mobile & Tablet: Ensure top toasts don't overlap the 70px fixed Navbar */
+.Toastify__toast-container--top-center,
+.Toastify__toast-container--top-right {
+  top: 85px !important;
+}
+
+.Toastify__toast {
+  border-radius: 12px !important;
+  font-family: 'Outfit', sans-serif !important;
+  padding: 12px 16px !important;
+  box-shadow: var(--shadow-xl) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.Toastify__toast--success {
+  background: white !important;
+  color: var(--text-primary) !important;
+  border-left: 6px solid var(--success) !important;
+}
+
+.Toastify__toast--error {
+  background: white !important;
+  color: var(--text-primary) !important;
+  border-left: 6px solid var(--error) !important;
+}
+
+.Toastify__toast--info {
+  background: white !important;
+  color: var(--text-primary) !important;
+  border-left: 6px solid var(--primary) !important;
+}
+
+.Toastify__close-button {
+  color: var(--text-muted) !important;
+  opacity: 0.7;
+}
+
+.Toastify__close-button:hover {
+  opacity: 1;
 }

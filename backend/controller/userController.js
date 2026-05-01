@@ -1,5 +1,5 @@
 import { User } from "../models/userModel.js";
-import generateToken from "../utils/generateToken.js";
+import sendToken from "../utils/sendToken.js";
 import { asyncHandler } from "../middleware/asyncHandler.js";
 import { successResponse, errorResponse } from "../utils/apiResponse.js";
 
@@ -23,8 +23,7 @@ export const registerUser = asyncHandler(async (req, res) => {
   const user = new User({ name, email, password });
   await user.save();
 
-  const token = generateToken(user.id, user.email);
-  return successResponse(res, { token, user: user.name }, "User registered successfully", 201);
+  return sendToken(user, 201, res, "User registered successfully");
 });
 
 /**
@@ -40,8 +39,7 @@ export const loginUser = asyncHandler(async (req, res) => {
     return errorResponse(res, "Invalid email or password", 401);
   }
 
-  const token = generateToken(user.id, user.email);
-  return successResponse(res, { token, user: user.name }, "Logged in successfully");
+  return sendToken(user, 200, res, "Logged in successfully");
 });
 
 /**
@@ -62,6 +60,27 @@ export const demoLogin = asyncHandler(async (req, res) => {
     await user.save();
   }
 
-  const token = generateToken(user.id, user.email);
-  return successResponse(res, { token, user: user.name }, "Logged in as Demo User");
+  return sendToken(user, 200, res, "Logged in as Demo User");
+});
+
+/**
+ * @desc    Log user out / clear cookie
+ * @route   POST /api/users/logout
+ * @access  Public
+ */
+export const logoutUser = asyncHandler(async (req, res) => {
+  res.cookie("token", "", {
+    httpOnly: true,
+    expires: new Date(0),
+  });
+  return successResponse(res, null, "Logged out successfully");
+});
+
+/**
+ * @desc    Get current user profile
+ * @route   GET /api/users/me
+ * @access  Private
+ */
+export const getMe = asyncHandler(async (req, res) => {
+  return successResponse(res, { user: req.user.name }, "User profile fetched");
 });
