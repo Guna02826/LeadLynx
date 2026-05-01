@@ -1,6 +1,6 @@
 # LeadLynx: Premium CRM & Outreach Platform
 
-LeadLynx is a high-performance, full-stack lead and campaign management application. It's designed to help businesses organize their outreach efforts with a modern, intuitive interface and a robust backend.
+LeadLynx is a high-performance, full-stack lead and campaign management application. It's designed to help businesses organize their outreach efforts with a modern, intuitive interface and a robust backend architecture.
 
 ## 🚀 Key Features
 
@@ -8,7 +8,21 @@ LeadLynx is a high-performance, full-stack lead and campaign management applicat
 - **Smart Lead Management**: Centralized database for capturing and managing leads with instant search and filtering.
 - **Personalized Campaigns**: Launch personalized email campaigns using dynamic placeholders like `{name}` and `{company}`.
 - **Premium UX/UI**: Built with a custom design system, glassmorphism effects, and smooth page transitions using Framer Motion.
-- **Secure Foundation**: JWT-based authentication, helmet-secured HTTP headers, and structured backend validation.
+- **Atomic UI System**: Highly modular component architecture for maximum reusability and consistency.
+
+## 🏗️ Architecture & Design Decisions
+
+This project was built with a focus on **clean code** and **scalable architecture**. Key decisions include:
+
+### ⚛️ Frontend: Context API & Atomic Design
+- **React Context API**: Used for authentication state management to ensure a single source of truth and eliminate "prop-drilling."
+- **Atomic Component Structure**: UI elements are broken down into `common` atomic units (Buttons, Inputs, Badges), ensuring that a single change in the design system reflects globally.
+- **Axios Interceptors**: Implemented global request/response handling to automatically manage JWT tokens and handle session expirations (401 errors).
+
+### 🛠️ Backend: Standardized REST API
+- **Standardized Responses**: Every API endpoint returns a consistent `{ success, data, message }` structure, making frontend integration predictable and robust.
+- **Async Middleware**: Used a higher-order `asyncHandler` to eliminate repetitive `try-catch` blocks, keeping controllers clean and focused on business logic.
+- **Security First**: Implemented `helmet` for secure headers, `express-validator` for data integrity, and `bcryptjs` for hashed password storage.
 
 ## 🛠 Tech Stack
 
@@ -17,32 +31,33 @@ LeadLynx is a high-performance, full-stack lead and campaign management applicat
 - **Framer Motion**: Smooth, cinematic animations and transitions.
 - **Lucide React**: Premium, consistent iconography.
 - **CSS Modules**: Scoped, maintainable styling with a centralized design system.
-- **Axios**: Interceptor-based API client for global auth and error handling.
+- **Axios**: Interceptor-based API client.
 
 ### Backend
 - **Node.js & Express**: Scalable, asynchronous server architecture.
 - **MongoDB & Mongoose**: Flexible document-based data modeling.
-- **Express Validator**: Structured request validation for all API endpoints.
+- **Express Validator**: Structured request validation.
 - **SendGrid**: Reliable email delivery integration.
-- **JWT**: Stateless session management.
+- **JWT**: Stateless session management with custom `protect` middleware.
 
 ## 📂 Project Structure
 
 ```text
 ├── backend/
-│   ├── config/         # Database configuration
-│   ├── controller/     # Business logic & request handlers
-│   ├── middleware/     # Auth, Error, and Validation middlewares
+│   ├── controller/     # JSDoc documented business logic
+│   ├── middleware/     # Auth, Error, Async, and Validation
 │   ├── models/         # Mongoose schema definitions
 │   ├── routes/         # REST API endpoint definitions
-│   ├── utils/          # Helper utilities (Email, JWT)
+│   ├── utils/          # Standardized API Response & Email helpers
 │   └── server.js       # Entry point
 └── frontend/
     ├── src/
-    │   ├── components/ # Reusable UI components & Global Layout
+    │   ├── components/
+    │   │   ├── common/ # Atomic UI components (Button, Input, Badge)
+    │   │   └── ...     # Specialized UI components (StatCard, LeadCard)
+    │   ├── context/    # Global State (AuthContext)
     │   ├── pages/      # View components with modular CSS
-    │   ├── api.js      # Global Axios instance
-    │   └── index.css   # Centralized Design System
+    │   └── api.js      # Global Axios instance
     └── main.jsx        # App entry point
 ```
 
@@ -52,7 +67,7 @@ LeadLynx is a high-performance, full-stack lead and campaign management applicat
 ```powershell
 cd backend
 npm install
-# Configure .env (see Environment Variables)
+# Copy .env.example to .env and fill in your keys
 npm run dev
 ```
 
@@ -65,30 +80,16 @@ npm run dev
 
 ## 🔐 Environment Variables
 
-Create `.env` files in both directories:
-
-**Backend (`backend/.env`):**
-```env
-PORT=5000
-MONGO_URI=your_mongodb_uri
-JWT_SECRET=your_jwt_secret
-SENDGRID_API_KEY=your_api_key
-EMAIL_USER=verified_sender@example.com
-```
-
-**Frontend (`frontend/.env`):**
-```env
-VITE_BASE_URL=http://localhost:5000/api
-```
+Refer to [.env.example](.env.example) in the root directory for a full list of required variables.
 
 ---
 
 ## 📈 Engineering Highlights
 
-- **Aesthetic Excellence**: Implemented a comprehensive design system with HSL-based color tokens, ensuring visual consistency across all components.
-- **Robustness**: Replaced manual checks with `express-validator` to ensure data integrity and provide clear API feedback.
-- **Performance**: Leveraged Vite's lightning-fast bundling and React's efficient state management to ensure a near-instant user experience.
-- **UX-First Design**: Implemented loading skeletons, empty states, and descriptive toast notifications to keep users informed.
+- **Aesthetic Excellence**: Implemented a comprehensive design system with HSL-based color tokens.
+- **Developer Experience (DX)**: Full JSDoc documentation for all API controllers and helper utilities.
+- **Robustness**: Global error handling middleware ensures the server never crashes on unexpected inputs.
+- **UX-First Design**: Implemented loading states, empty states, and descriptive toast notifications.
 
 ---
-*Developed as a premium showcase project.*
+*Developed with a focus on professional software engineering standards.*
