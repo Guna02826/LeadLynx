@@ -11,7 +11,7 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
     name: "",
     email: "",
     company: "",
-    source: "Manual",
+    source: "",
     status: "New",
   });
 
@@ -19,7 +19,7 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
 
   useEffect(() => {
     if (editingLead) setForm(editingLead);
-    else setForm({ name: "", email: "", company: "", source: "Manual", status: "New" });
+    else setForm({ name: "", email: "", company: "", source: "", status: "New" });
   }, [editingLead]);
 
   const handleChange = (e) => {
@@ -38,7 +38,7 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
         const response = await api.post("/leads", form);
         toast.success(response.data.message || "New lead added successfully");
       }
-      setForm({ name: "", email: "", company: "", source: "Manual", status: "New" });
+      setForm({ name: "", email: "", company: "", source: "", status: "New" });
       fetchLeads();
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong");
@@ -58,7 +58,7 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
         <Input
           label="Full Name"
           name="name"
-          placeholder="John Doe"
+          placeholder="Enter full name"
           value={form.name}
           onChange={handleChange}
           required
@@ -68,7 +68,7 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
           label="Email Address"
           type="email"
           name="email"
-          placeholder="john@example.com"
+          placeholder="Enter email address"
           value={form.email}
           onChange={handleChange}
           required
@@ -77,7 +77,7 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
         <Input
           label="Company"
           name="company"
-          placeholder="Acme Inc."
+          placeholder="Enter company name"
           value={form.company}
           onChange={handleChange}
           required
@@ -86,7 +86,7 @@ function LeadForm({ fetchLeads, editingLead, setEditingLead }) {
         <Input
           label="Source"
           name="source"
-          placeholder="Manual, Website, etc."
+          placeholder="Enter lead source (e.g. Website)"
           value={form.source}
           onChange={handleChange}
         />

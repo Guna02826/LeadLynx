@@ -1,6 +1,6 @@
 import styles from "./Input.module.css";
 
-const Input = ({ label, type = "text", name, placeholder, value, onChange, required = false, className = "" }) => {
+const Input = ({ label, type = "text", name, placeholder, value, onChange, required = false, className = "", ...props }) => {
   return (
     <div className={`${styles.container} ${className}`}>
       {label && <label className={styles.label}>{label}</label>}
@@ -11,7 +11,9 @@ const Input = ({ label, type = "text", name, placeholder, value, onChange, requi
         value={value}
         onChange={onChange}
         required={required}
+        autoComplete="off"
         className={styles.input}
+        {...props}
       />
     </div>
   );
