@@ -11,11 +11,14 @@ import { successResponse } from "./apiResponse.js";
 const sendToken = (user, statusCode, res, message) => {
   const token = generateToken(user.id, user.email);
 
+  const isProduction = process.env.NODE_ENV === "production";
+
   const cookieOptions = {
     expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: isProduction, // Must be true for sameSite: 'none'
+    sameSite: isProduction ? "none" : "lax",
+    path: "/", // Ensure cookie is accessible across all paths
   };
 
   res.cookie("token", token, cookieOptions);

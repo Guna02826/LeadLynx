@@ -12,6 +12,7 @@ import { errorHandler } from "./middleware/errorMiddleware.js";
 dotenv.config({ quiet: true, override: true });
 
 const app = express();
+app.set("trust proxy", 1);
 connectDB();
 
 app.use(helmet());

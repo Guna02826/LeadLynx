@@ -69,9 +69,14 @@ export const demoLogin = asyncHandler(async (req, res) => {
  * @access  Public
  */
 export const logoutUser = asyncHandler(async (req, res) => {
+  const isProduction = process.env.NODE_ENV === "production";
+  
   res.cookie("token", "", {
     httpOnly: true,
     expires: new Date(0),
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    path: "/",
   });
   return successResponse(res, null, "Logged out successfully");
 });
