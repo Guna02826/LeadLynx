@@ -22,11 +22,16 @@ export const getCampaign = asyncHandler(async (req, res) => {
  * @access  Private
  */
 export const createCampaign = asyncHandler(async (req, res) => {
+  const { title, subject, text, status } = req.body;
+
   const leads = await Lead.find({ owner: req.user.id });
   const leadsIds = leads.map((lead) => lead._id);
 
   const campaign = await Campaign.create({
-    ...req.body,
+    title, 
+    subject, 
+    text, 
+    status,
     owner: req.user.id,
     leads: leadsIds,
   });
@@ -104,7 +109,14 @@ export const updateCampaign = asyncHandler(async (req, res) => {
     return errorResponse(res, "Not authorized to update this campaign", 403);
   }
 
-  const updatedCampaign = await Campaign.findByIdAndUpdate(id, req.body, { new: true });
+  const { title, subject, text, status } = req.body;
+  const updateData = {};
+  if (title !== undefined) updateData.title = title;
+  if (subject !== undefined) updateData.subject = subject;
+  if (text !== undefined) updateData.text = text;
+  if (status !== undefined) updateData.status = status;
+
+  const updatedCampaign = await Campaign.findByIdAndUpdate(id, updateData, { new: true });
   return successResponse(res, { campaign: updatedCampaign }, "Campaign updated successfully");
 });
 

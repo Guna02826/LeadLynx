@@ -18,7 +18,17 @@ export const getLeads = asyncHandler(async (req, res) => {
  * @access  Private
  */
 export const createLead = asyncHandler(async (req, res) => {
-  const lead = await Lead.create({ ...req.body, owner: req.user._id });
+  const { name, email, company, status, source } = req.body;
+
+  const lead = await Lead.create({ 
+    name, 
+    email, 
+    company, 
+    status, 
+    source, 
+    owner: req.user._id 
+  });
+  
   return successResponse(res, lead, "New lead created successfully", 201);
 });
 
@@ -39,7 +49,15 @@ export const updateLead = asyncHandler(async (req, res) => {
     return errorResponse(res, "Not authorized to modify this lead", 403);
   }
 
-  const updatedLead = await Lead.findByIdAndUpdate(id, req.body, { new: true });
+  const { name, email, company, status, source } = req.body;
+  const updateData = {};
+  if (name !== undefined) updateData.name = name;
+  if (email !== undefined) updateData.email = email;
+  if (company !== undefined) updateData.company = company;
+  if (status !== undefined) updateData.status = status;
+  if (source !== undefined) updateData.source = source;
+
+  const updatedLead = await Lead.findByIdAndUpdate(id, updateData, { new: true });
   return successResponse(res, updatedLead, "Lead updated successfully");
 });
 
