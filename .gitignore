@@ -64,3 +64,18 @@ Desktop.ini
 backend/scripts/seedData.js
 tmp/
 temp/
+
+# -----------------------
+# Testing Files (Ignored)
+# -----------------------
+**/__tests__/
+**/tests/
+*.test.js
+*.test.jsx
+*.spec.js
+*.spec.jsx
+jest.config.js
+vitest.config.js
+vitest.setup.js
+testDb.js
+coverage/
