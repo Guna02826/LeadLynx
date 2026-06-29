@@ -1,5 +1,6 @@
 import express from "express";
 import { body } from "express-validator";
+import rateLimit from "express-rate-limit";
 import {
   getCampaign,
   createCampaign,
@@ -11,6 +12,12 @@ import protect from "../middleware/authMiddleware.js";
 import { validateRequest } from "../middleware/validatorMiddleware.js";
 
 const router = express.Router();
+
+const sendLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 3,
+  message: { success: false, message: "Too many send requests. Please wait before launching again." },
+});
 
 router
   .route("")
@@ -26,7 +33,7 @@ router
     createCampaign
   );
 
-router.route("/:id/send").all(protect).post(sendCampaign);
+router.route("/:id/send").all(protect).post(sendLimiter, sendCampaign);
 
 router
   .route("/:id")
