@@ -1,5 +1,7 @@
 # LeadLynx: Premium CRM & Outreach Platform
 
+## 🔗 [Live Demo](https://leadlynx.netlify.app/com)
+
 LeadLynx is a high-performance, full-stack lead and campaign management application. It's designed to help businesses organize their outreach efforts with a modern, intuitive interface and a robust backend architecture.
 
 ## 🚀 Key Features
