@@ -20,16 +20,23 @@ export const getLeads = asyncHandler(async (req, res) => {
 export const createLead = asyncHandler(async (req, res) => {
   const { name, email, company, status, source } = req.body;
 
-  const lead = await Lead.create({ 
-    name, 
-    email, 
-    company, 
-    status, 
-    source, 
-    owner: req.user._id 
-  });
-  
-  return successResponse(res, lead, "New lead created successfully", 201);
+  try {
+    const lead = await Lead.create({ 
+      name, 
+      email, 
+      company, 
+      status, 
+      source, 
+      owner: req.user._id 
+    });
+    
+    return successResponse(res, lead, "New lead created successfully", 201);
+  } catch (error) {
+    if (error.code === 11000) {
+      return errorResponse(res, "A lead with this email already exists", 409);
+    }
+    throw error;
+  }
 });
 
 /**
